@@ -18,7 +18,9 @@
 // AMultiplayMenuSystemCharacter
 
 AMultiplayMenuSystemCharacter::AMultiplayMenuSystemCharacter():
-	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
+	// Bind function to delegate
+	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
+	FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -115,9 +117,27 @@ void AMultiplayMenuSystemCharacter::CreateGameSession()
 	SessionSettings->bAllowJoinViaPresence = true;
 	SessionSettings->bShouldAdvertise = true;
 	SessionSettings->bUsesPresence = true;
+	SessionSettings->bUseLobbiesIfAvailable = true;
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings);
+}
+
+void AMultiplayMenuSystemCharacter::JoinGameSession()
+{
+	// Find game sessions
+	if (!OnlineSessionInterface.IsValid()) return;
+
+	// Add delegate to delegate list
+	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
+
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	SessionSearch->MaxSearchResults = 10000;
+	SessionSearch->bIsLanQuery = false;
+	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
 
 void AMultiplayMenuSystemCharacter::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
@@ -142,6 +162,25 @@ void AMultiplayMenuSystemCharacter::OnCreateSessionComplete(FName SessionName, b
 			FColor::Red,
 			FString(TEXT("Failed to create session!"))
 		);
+	}
+}
+
+void AMultiplayMenuSystemCharacter::OnFindSessionComplete(bool bWasSuccessful)
+{
+	for (auto Result : SessionSearch->SearchResults)
+	{
+		FString Id = Result.GetSessionIdStr();
+		FString User = Result.Session.OwningUserName;
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Cyan,
+				FString::Printf(TEXT("Id %s, User::: %s"), *Id, *User)
+			);
+		}
 	}
 }
 
