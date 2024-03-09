@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+
+#include "Interfaces/OnlineSessionInterface.h"
+
 #include "MultiplayMenuSystemCharacter.generated.h"
 
 
@@ -68,7 +71,16 @@ public:
 
 public:
 	// Pointer to the Online session interface
-	TSharedPtr<class IOnlineSession, ESPMode::ThreadSafe> OnlineSessionInterface;		// Create a shared pointer of IOnlineSession class and ThreadSafe Mode, avoid include in header file
+	IOnlineSessionPtr OnlineSessionInterface;
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	void CreateGameSession();
+
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+
+private:
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 
 };
 
