@@ -70,7 +70,7 @@ AMultiplayMenuSystemCharacter::AMultiplayMenuSystemCharacter():
 			GEngine->AddOnScreenDebugMessage(
 				-1,
 				15.f,
-				FColor::Blue,
+				FColor::Green,
 				FString::Printf(TEXT("Found subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString())
 			);
 		}
@@ -151,7 +151,7 @@ void AMultiplayMenuSystemCharacter::OnCreateSessionComplete(FName SessionName, b
 			GEngine->AddOnScreenDebugMessage(
 				-1,
 				15.f,
-				FColor::Blue,
+				FColor::Green,
 				FString::Printf(TEXT("Created Session: %s"), *SessionName.ToString())
 			);
 		}
@@ -168,7 +168,7 @@ void AMultiplayMenuSystemCharacter::OnCreateSessionComplete(FName SessionName, b
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.f,
-			FColor::Red,
+			FColor::Green,
 			FString(TEXT("Failed to create session!"))
 		);
 	}
@@ -191,7 +191,7 @@ void AMultiplayMenuSystemCharacter::OnFindSessionComplete(bool bWasSuccessful)
 			GEngine->AddOnScreenDebugMessage(
 				-1,
 				15.f,
-				FColor::Cyan,
+				FColor::Green,
 				FString::Printf(TEXT("Id %s, User::: %s"), *Id, *User)
 			);
 		}
@@ -203,7 +203,7 @@ void AMultiplayMenuSystemCharacter::OnFindSessionComplete(bool bWasSuccessful)
 				GEngine->AddOnScreenDebugMessage(
 					-1,
 					15.f,
-					FColor::Cyan,
+					FColor::Green,
 					FString::Printf(TEXT("Joining Match Type %s"), *MatchType)
 				);
 			}
@@ -228,7 +228,7 @@ void AMultiplayMenuSystemCharacter::OnJoinSessionComplete(FName SessionName, EOn
 			GEngine->AddOnScreenDebugMessage(
 				-1,
 				15.f,
-				FColor::Yellow,
+				FColor::Green,
 				FString::Printf(TEXT("Connect string: %s"), *Address)
 			);
 		}
@@ -236,7 +236,16 @@ void AMultiplayMenuSystemCharacter::OnJoinSessionComplete(FName SessionName, EOn
 		APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
 		if (PlayerController)
 		{
-			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+			//PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					15.f,
+					FColor::Green,
+					FString::Printf(TEXT("Doing nothing"))
+				);
+			}
 		}
 	}
 }

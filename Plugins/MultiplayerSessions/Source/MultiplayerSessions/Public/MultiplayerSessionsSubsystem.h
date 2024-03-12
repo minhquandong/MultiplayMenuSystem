@@ -32,7 +32,7 @@ public:
 	// To handle session funtionality. The Menu class will call these
 	//
 	void CreateSession(int32 NumPublicConnections, FString MatchType);
-	void FindSessions(int32 MaxSearchResults);
+	void FindSessions(int32 MaxSearchResults);									// The case find sessions return FALSE logic here
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
 	void StartSession();
@@ -52,7 +52,7 @@ protected:
 	// These don't need to be called outside this class
 	//
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionsComplete(bool bWasSuccessful);
+	void OnFindSessionsComplete(bool bWasSuccessful);								// The case find sessions return TRUE logic here
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
@@ -60,6 +60,7 @@ protected:
 private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
+	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
 
 	//
 	// To add to the Online Session Interface delegate list
@@ -71,6 +72,7 @@ private:
 	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
 	FOnStartSessionCompleteDelegate StartSessionCompleteDelegate;
 
+	// Create delegate handle variables so we can clear it when done
 	FDelegateHandle CreateSessionCompleteDelegateHandle;
 	FDelegateHandle FindSessionsCompleteDelegateHandle;
 	FDelegateHandle JoinSessionCompleteDelegateHandle;
